@@ -62,6 +62,28 @@ async function createUserByGoogle({nombre, email, google_id}){
     }
 }
 
+async function findUserByFacebookId(facebook_id){
+    try{
+        const query = 'SELECT * FROM usuario WHERE facebook_id = $1';
+        const {rows} = await db.query(query, [facebook_id]);
+        return rows[0];
+    } catch(error){
+        console.error('Error al buscar usuario por facebook_id:', error);
+        throw error;
+    }
+}
+
+async function createUserByFacebook({nombre, email, facebook_id}){
+    try{
+        const query = 'INSERT INTO usuario (nombre, email, facebook_id) VALUES ($1, $2, $3) RETURNING id_usuario, nombre, email;';
+        const {rows} = await db.query(query, [nombre, email, facebook_id]);
+        return rows[0];
+    } catch (error){
+        console.error('Error al crear usuario con Facebook:', error);
+        throw error;
+    }
+}
+
 async function findUserById(id){
     try{
         const query = 'SELECT * FROM usuario WHERE id_usuario = $1';
@@ -74,4 +96,4 @@ async function findUserById(id){
 }
 
 
-module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById};
+module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook};

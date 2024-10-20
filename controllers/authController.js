@@ -1,5 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const userModel = require('../models/userModel');
 require('dotenv').config();
 
@@ -11,7 +12,12 @@ passport.use(new GoogleStrategy({
     async (accessToken, refreshToken, profile, done) =>{
         try {
             let user = await userModel.findUserByGoogleId(profile.id)
+            console.log(user);
             if(!user){
+                const existeUsuario = await userModel.findUserByEmail(profile.emails[0].value);
+                if(existeUsuario){
+                    return done(null, false, 'El correo ya está registrado')
+                };
                 user = await userModel.createUserByGoogle({
                     nombre: profile.displayName,
                     email: profile.emails[0].value,
@@ -20,10 +26,40 @@ passport.use(new GoogleStrategy({
             }
             return done(null,user)
         } catch(error){
+            console.log('Error durante la autenticación con Google:', error);
             return done(error);
         }
     }
 ));
+
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: 'http://localhost:3000/auth/facebook/callback',
+    profileFields: ['id', 'displayName', 'email']
+    },
+    async(accessToken, refreshToken, profile, done) =>{
+        try{
+            let user = await userModel.findUserByFacebookId(profile.id);
+            if(!user){
+                const existeUsuario = await userModel.findUserByEmail(profile.emails[0].value);
+                if(existeUsuario){
+                    return done(null, false, {message: 'El correo ya está registrado'});
+                }
+                user = await userModel.createUserByFacebook({
+                    nombre: profile.displayName,
+                    email: profile.emails[0].value,
+                    facebook_id: profile.id
+                });
+            }
+            return done(null, user);
+        } catch(error){
+            console.log('Error durante la autenticación con Facebook:', error);
+            return done(error);
+        }
+    }
+));
+
 
 passport.serializeUser((user, done) => {
     done(null, user.id_usuario);
