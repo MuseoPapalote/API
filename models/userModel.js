@@ -84,6 +84,24 @@ async function createUserByFacebook({nombre, email, facebook_id}){
     }
 }
 
+async function deleteUser(id){
+    try{
+        const progresoQuery = 'DELETE FROM progresozona WHERE id_usuario = $1';
+        await db.query(progresoQuery, [id]);
+        const visitaQuery = 'DELETE FROM visita WHERE id_usuario = $1';
+        await db.query(visitaQuery, [id]);
+        const encuestaQuery = 'DELETE FROM encuestasatisfaccion WHERE id_usuario = $1';
+        await db.query(encuestaQuery, [id]);
+        const respuestaQuery = 'DELETE FROM respuestatrivia WHERE id_usuario = $1';
+        await db.query(respuestaQuery, [id]);
+        const query = 'DELETE FROM usuario WHERE id_usuario = $1';
+        await db.query(query, [id]);
+    } catch(error){
+        console.error('Error al eliminar usuario:', error);
+        throw error;
+    }
+}
+
 async function findUserById(id){
     try{
         const query = 'SELECT * FROM usuario WHERE id_usuario = $1';
@@ -96,4 +114,4 @@ async function findUserById(id){
 }
 
 
-module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook};
+module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser};

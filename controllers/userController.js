@@ -48,4 +48,16 @@ async function loginUser(req, res) {
     }
 }
 
-module.exports = { registerUser, loginUser };
+async function deleteUser(req, res) {
+    try {
+        const { id_usuario } = req.user;  // Extraemos el id_usuario del token decodificado
+
+        await userModel.deleteUser(id_usuario);  // Llamamos al modelo para eliminar el usuario
+        res.status(200).send('Usuario eliminado correctamente');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al eliminar usuario');
+    }
+}
+
+module.exports = { registerUser, loginUser, deleteUser };
