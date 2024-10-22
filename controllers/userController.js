@@ -21,6 +21,24 @@ async function registerUser(req,res){
     }
 }
 
+async function createInitialAdmin(req,res){
+    const {nombre, email, password,rol} = req.body;
+    try{
+        const existeUsuario = await userModel.findUserByEmail(email);
+        if(existeUsuario){
+            return res.status(400).send('El correo ya está registrado');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await userModel.createAdminUser(nombre, email, hashedPassword,rol);
+        const token = jwt.sign({id_usuario: newUser.id_usuario}, process.env.JWT_SECRET, {expiresIn: '24h'});
+        res.status(201).send({token});
+    } catch(error){
+        console.error(error);
+        res.status(500).send('Error al registrar usuario');
+    }
+}
+
 async function loginUser(req, res) {
     const { email, password } = req.body;
 
@@ -38,7 +56,7 @@ async function loginUser(req, res) {
         }
 
         // Generar el token JWT
-        const token = jwt.sign({ id_usuario: usuario.id_usuario }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id_usuario: usuario.id_usuario, rol:usuario.rol }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Respuesta exitosa con el token
         res.status(200).json({ token });
@@ -60,4 +78,4 @@ async function deleteUser(req, res) {
     }
 }
 
-module.exports = { registerUser, loginUser, deleteUser };
+module.exports = { registerUser, loginUser, deleteUser, createInitialAdmin };

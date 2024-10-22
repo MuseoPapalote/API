@@ -7,10 +7,11 @@ const mysql = require('mysql2');
 require('dotenv').config(); // Load environment variables at the top
 
 const app = express();
-const PORT = 3000;
+const PORT = 8080;
 
 const userRoutes = require('./routes/userRoute');
 const authRoutes = require('./routes/authRoute');
+const adminRoutes = require('./routes/adminRoute');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -26,6 +27,7 @@ app.use(passport.session());
 
 app.use('/usuarios', userRoutes);
 app.use('/auth', authRoutes);
+app.use('/admin', adminRoutes);
 
 app.get('/dashboard',(req,res) => {
     if(req.isAuthenticated()){

@@ -22,6 +22,17 @@ async function createUser({nombre, email, password}){
     }
 }
 
+async function createAdminUser(nombre,email,password,rol){
+    try{
+        const query = 'INSERT INTO usuario (nombre, email, password, rol) VALUES ($1, $2, $3, $4) RETURNING *;';
+        const {rows} = await db.query(query, [nombre, email, password,rol]);
+        return rows[0];
+    } catch (error){
+        console.error('Error al crear usuario admin:', error);
+        throw error;
+    }
+}
+
 async function createProgressForuser(id_usuario){
     try{
         const zonasQuery = 'SELECT * FROM zona;';
@@ -114,4 +125,4 @@ async function findUserById(id){
 }
 
 
-module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser};
+module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser};
