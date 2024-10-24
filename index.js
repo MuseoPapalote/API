@@ -12,6 +12,8 @@ const PORT = 8080;
 const userRoutes = require('./routes/userRoute');
 const authRoutes = require('./routes/authRoute');
 const adminRoutes = require('./routes/adminRoute');
+const progressZoneRoutes = require('./routes/progressZoneRoute');
+const visitRoutes = require('./routes/visitRoute');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -28,6 +30,8 @@ app.use(passport.session());
 app.use('/usuarios', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
+app.use('/progressZone', progressZoneRoutes);
+app.use('/visit', visitRoutes);
 
 app.get('/dashboard',(req,res) => {
     if(req.isAuthenticated()){
