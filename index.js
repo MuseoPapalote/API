@@ -10,10 +10,13 @@ const app = express();
 const PORT = 8080;
 
 const userRoutes = require('./routes/userRoute');
-const authRoutes = require('./routes/authRoute');
 const adminRoutes = require('./routes/adminRoute');
+
+const authRoutes = require('./routes/authRoute');
 const progressZoneRoutes = require('./routes/progressZoneRoute');
 const visitRoutes = require('./routes/visitRoute');
+const encuestaRoutes = require('./routes/encuestaRoute');
+const respuestaTriviaRoutes = require('./routes/respuestaTriviaRoute');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -32,6 +35,8 @@ app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/progressZone', progressZoneRoutes);
 app.use('/visit', visitRoutes);
+app.use('/encuesta', encuestaRoutes);
+app.use('/respuestaTrivia', respuestaTriviaRoutes);
 
 app.get('/dashboard',(req,res) => {
     if(req.isAuthenticated()){

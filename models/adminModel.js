@@ -14,6 +14,10 @@ async function editZona(id_zona, nombre_zona, descripcion) {
 }
 
 async function deleteZona(id_zona) {
+    const exposicionQuery = 'DELETE FROM exposicion WHERE id_zona = $1;';
+    await db.query(exposicionQuery, [id_zona]);
+    const progresoQuery = 'DELETE FROM progresozona WHERE id_zona = $1;';
+    await db.query(progresoQuery, [id_zona]);
     const query = 'DELETE FROM zona WHERE id_zona = $1;';
     await db.query(query, [id_zona]);
 }
@@ -32,20 +36,22 @@ async function editExposicion(id_exposicion, nombre_exposicion, descripcion, cod
 }
 
 async function deleteExposicion(id_exposicion) {
+    const visitaQuery = 'DELETE FROM visita WHERE id_exposicion = $1;';
     const query = 'DELETE FROM exposicion WHERE id_exposicion = $1;';
+    await db.query(visitaQuery, [id_exposicion]);
     await db.query(query, [id_exposicion]);
 }
 
 // Preguntas
-async function createPregunta(texto_pregunta, tipo_pregunta) {
-    const query = 'INSERT INTO preguntatrivia (texto_pregunta, tipo_pregunta) VALUES ($1, $2) RETURNING *;';
-    const { rows } = await db.query(query, [texto_pregunta, tipo_pregunta]);
+async function createPregunta(texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta) {
+    const query = 'INSERT INTO preguntatrivia (texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta) VALUES ($1, $2, $3, $4, $5) RETURNING *;';
+    const { rows } = await db.query(query, [texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta]);
     return rows[0];
 }
 
-async function editPregunta(id_pregunta, texto_pregunta, tipo_pregunta) {
-    const query = 'UPDATE preguntatrivia SET texto_pregunta = $1, tipo_pregunta = $2 WHERE id_pregunta = $3 RETURNING *;';
-    const { rows } = await db.query(query, [texto_pregunta, tipo_pregunta, id_pregunta]);
+async function editPregunta(id_pregunta, texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta) {
+    const query = 'UPDATE preguntatrivia SET texto_pregunta = $1, opcion_1 = $2, opcion_2 = $3, opcion_3 = $4, respuesta_correcta = $5 WHERE id_pregunta = $6 RETURNING *;';
+    const { rows } = await db.query(query, [texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta, id_pregunta]);
     return rows[0];
 }
 
