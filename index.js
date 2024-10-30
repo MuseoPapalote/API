@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sesion = require('express-session');
 const passport = require('passport');
+const swaggerUI = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 var cors = require('cors');
 const mysql = require('mysql2');
 require('dotenv').config(); // Load environment variables at the top
@@ -30,6 +32,7 @@ app.use(sesion({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use('/usuarios', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
@@ -44,6 +47,10 @@ app.get('/dashboard',(req,res) => {
     } else {
         res.redirect('/');
     }
+});
+
+app.get('/',(req,res) => {
+    res.send('Bienvenido a la página principal');
 });
 
 app.listen(
