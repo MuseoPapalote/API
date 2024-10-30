@@ -7,8 +7,8 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  * @swagger
  * /visit/register:
  *   post:
- *     summary: Registra una visita a una exposición
- *     description: Permite a un usuario registrar su visita a una exposición específica en el museo
+ *     summary: Registra una visita usando el contenido del QR
+ *     description: Registra una visita de un usuario a una exposición usando el contenido del QR en lugar del ID de la exposición.
  *     tags:
  *       - Visitas
  *     security:
@@ -22,32 +22,17 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  *             properties:
  *               id_usuario:
  *                 type: integer
- *                 example: 1
- *                 description: ID del usuario que registra la visita
- *               id_exposicion:
- *                 type: integer
- *                 example: 10
- *                 description: ID de la exposición que el usuario está visitando
+ *                 description: ID del usuario
+ *               contenido_qr:
+ *                 type: string
+ *                 description: Contenido del código QR de la exposición
  *     responses:
- *       200:
+ *       201:
  *         description: Visita registrada exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: "Visita registrada exitosamente"
- *       400:
- *         description: Error en la solicitud (por ejemplo, datos faltantes o inválidos)
- *       401:
- *         description: No autorizado. El usuario no está autenticado
+ *       404:
+ *         description: Exposición no encontrada con el QR proporcionado
  *       500:
- *         description: Error en el servidor
+ *         description: Error al registrar la visita
  */
 router.post('/register', isAuthenticated, visitController.registerVisit);
 
