@@ -12,4 +12,15 @@ async function createRespuestaTrivia(req, res){
     }
 }
 
-module.exports = {createRespuestaTrivia};
+async function getUserRespuestaTriviaAnswers(req, res){
+    const id_usuario = req.user.id_usuario;
+    try{
+        const respuestas = await respuestaTriviaModel.getUserRespuestaTriviaAnswers(id_usuario);
+        res.status(200).json(respuestas);
+    }catch(error){
+        console.error('Error al obtener respuestas:', error);
+        res.status(500).json({message: 'Error al obtener respuestas'});
+    }
+}
+
+module.exports = {createRespuestaTrivia, getUserRespuestaTriviaAnswers};

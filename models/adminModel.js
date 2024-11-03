@@ -1,5 +1,46 @@
 const { db } = require('../database/db');
 
+
+async function getAdminOverview(){
+    try{
+        const query = `
+        SELECT
+            (SELECT COUNT(*) FROM zona) AS total_zonas,
+            (SELECT COUNT(*) FROM exposicion) AS total_exposiciones;
+    `;
+        const { rows } = await db.query(query);
+        return rows;
+    }catch(error){
+        console.error('Error getting admin overview:', error);
+        throw error;
+    }
+}
+
+async function getVisitStats(){
+    try{
+        const queryZonas = `
+        SELECT z.id_zona, z.nombre_zona, COUNT(v.id_visita) AS total_visitas_zona
+        FROM zona z
+        JOIN exposicion e ON e.id_zona = z.id_zona
+        JOIN visita v ON v.id_exposicion = e.id_exposicion
+        GROUP BY z.id_zona;
+    `;
+    const queryExposiciones = `
+        SELECT e.id_exposicion, e.nombre_exposicion, COUNT(v.id_visita) AS total_visitas_exposicion
+        FROM exposicion e
+        JOIN visita v ON v.id_exposicion = e.id_exposicion
+        GROUP BY e.id_exposicion;
+    `;
+    const zonas = await db.query(queryZonas);
+    const exposiciones = await db.query(queryExposiciones);
+    return { zonas: zonas.rows, exposiciones: exposiciones.rows };
+    }catch(error){
+        console.error('Error getting visit stats:', error);
+        throw error;
+    }
+}
+
+
 // Zonas
 async function createZona(nombre_zona, descripcion) {
     try {
@@ -73,10 +114,10 @@ async function deleteExposicion(id_exposicion) {
 }
 
 // Preguntas
-async function createPregunta(texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) {
+async function createPregunta(id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) {
     try {
-        const query = 'INSERT INTO preguntatrivia (texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) VALUES ($1, $2, $3, $4, $5) RETURNING *;';
-        const { rows } = await db.query(query, [texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta]);
+        const query = 'INSERT INTO preguntatrivia (id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;';
+        const { rows } = await db.query(query, [id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta]);
         return rows[0];
     } catch (error) {
         console.error('Error creating pregunta:', error);
@@ -97,6 +138,8 @@ async function editPregunta(id_pregunta, texto_pregunta, opcion_1, opcion_2, opc
 
 async function deletePregunta(id_pregunta) {
     try {
+        const queryRespuesta = 'DELETE FROM respuestatrivia WHERE id_pregunta = $1;';
+        await db.query(queryRespuesta, [id_pregunta]);
         const query = 'DELETE FROM preguntatrivia WHERE id_pregunta = $1;';
         await db.query(query, [id_pregunta]);
     } catch (error) {
@@ -107,7 +150,21 @@ async function deletePregunta(id_pregunta) {
 
 async function getAllZonas() {
     try {
-        const query = 'SELECT * FROM zona;';
+        const query = `
+        SELECT 
+            z.id_zona,
+            z.nombre_zona,
+            z.descripcion,
+            COALESCE(SUM(vs.total_visitas), 0) AS total_visitas
+        FROM zona z
+        LEFT JOIN (
+            SELECT e.id_zona, COUNT(v.id_visita) AS total_visitas
+            FROM exposicion e
+            LEFT JOIN visita v ON v.id_exposicion = e.id_exposicion
+            GROUP BY e.id_zona
+        ) vs ON vs.id_zona = z.id_zona
+        GROUP BY z.id_zona;
+    `;
         const { rows } = await db.query(query);
         return rows;
     } catch (error) {
@@ -130,7 +187,20 @@ async function getZonaById(id_zona) {
 // Exposiciones
 async function getAllExposiciones() {
     try {
-        const query = 'SELECT * FROM exposicion;';
+        const query = `
+        SELECT 
+            e.id_exposicion,
+            e.nombre_exposicion,
+            z.nombre_zona AS nombre_zona,
+            e.descripcion,
+            e.codigo_qr,
+            e.activo,
+            COUNT(v.id_visita) AS total_visitas
+        FROM exposicion e
+        LEFT JOIN zona z ON z.id_zona = e.id_zona
+        LEFT JOIN visita v ON v.id_exposicion = e.id_exposicion
+        GROUP BY e.id_exposicion, z.nombre_zona;
+    `;
         const { rows } = await db.query(query);
         return rows;
     } catch (error) {
@@ -140,12 +210,44 @@ async function getAllExposiciones() {
 }
 
 async function getExposicionById(id_exposicion) {
+    const exposicionQuery = `
+        SELECT 
+            e.id_exposicion,
+            e.nombre_exposicion,
+            z.nombre_zona AS nombre_zona,
+            e.descripcion,
+            e.codigo_qr,
+            e.activo
+        FROM exposicion e
+        LEFT JOIN zona z ON e.id_zona = z.id_zona
+        WHERE e.id_exposicion = $1;
+    `;
+
+    const preguntasQuery = `
+        SELECT 
+            p.id_pregunta,
+            p.texto_pregunta,
+            p.opcion_1,
+            p.opcion_2,
+            p.opcion_3,
+            p.respuesta_correcta
+        FROM preguntatrivia p
+        WHERE p.id_exposicion = $1;
+    `;
+
     try {
-        const query = 'SELECT * FROM exposicion WHERE id_exposicion = $1;';
-        const { rows } = await db.query(query, [id_exposicion]);
-        return rows[0];
+        const exposicionResult = await db.query(exposicionQuery, [id_exposicion]);
+        const preguntasResult = await db.query(preguntasQuery, [id_exposicion]);
+
+        if (exposicionResult.rows.length === 0) {
+            return null; // Exposición no encontrada
+        }
+
+        const exposicion = exposicionResult.rows[0];
+        exposicion.preguntas = preguntasResult.rows; // Agregar preguntas a la exposición
+        return exposicion;
     } catch (error) {
-        console.error('Error getting exposicion by id:', error);
+        console.error('Error al obtener exposición con preguntas:', error);
         throw error;
     }
 }
@@ -174,6 +276,8 @@ async function getPreguntaById(id_pregunta) {
 }
 
 module.exports = {
+    getAdminOverview,
+    getVisitStats,
     createZona,
     editZona,
     deleteZona,

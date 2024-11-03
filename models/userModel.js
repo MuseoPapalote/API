@@ -124,5 +124,16 @@ async function findUserById(id){
     }
 }
 
+async function getUserEmails(){
+    try{
+        const query = 'SELECT email FROM usuario WHERE rol = $1';
+        const {rows} = await db.query(query, ['usuario']);
+        return rows.map(row => row.email);
+    }catch(error){
+        console.error('Error al obtener los correos de los usuarios:', error);
+        throw error;
+    }
+}
 
-module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser};
+
+module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser, getUserEmails};

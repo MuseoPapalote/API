@@ -16,4 +16,15 @@ async function createRespuestaTrivia(id_pregunta, id_usuario, opcion_seleccionad
     }
 }
 
-module.exports = {createRespuestaTrivia};
+async function getUserRespuestaTriviaAnswers(id_usuario){
+    try{
+        const query = 'SELECT r.id_respuesta, r.opcion_seleccionada, r.es_correcta, p.texto_pregunta, p.opcion_1, p.opcion_2, p.opcion_3 FROM respuestatrivia r JOIN preguntatrivia p ON r.id_pregunta = p.id_pregunta WHERE r.id_usuario = $1;';
+        const {rows} = await db.query(query, [id_usuario]);
+        return rows;
+    }catch(error){
+        console.error('Error al obtener respuestasTrivia de usuario:', error);
+        throw error;
+    }   
+}
+
+module.exports = {createRespuestaTrivia, getUserRespuestaTriviaAnswers};

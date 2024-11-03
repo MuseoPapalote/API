@@ -58,4 +58,6 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  */
 router.post('/', isAuthenticated, respuestaTriviaController.createRespuestaTrivia);
 
+router.get('/', isAuthenticated, respuestaTriviaController.getUserRespuestaTriviaAnswers);
+
 module.exports = router;

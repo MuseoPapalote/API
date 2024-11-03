@@ -1,7 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const encuestaController = require('../controllers/encuestaController');
 const { isAdmin } = require('../middlewares/isAdmin'); // Middleware de autenticación
+
+
+// Rutas para el panel de administrador
+router.get('/overview', isAdmin, adminController.getAdminOverview);
+router.get('/visitstats', isAdmin, adminController.getVisitStats);
+router.get('/emails', isAdmin, adminController.getUserEmails);
+
+// Rutas para encuestas de satisfacción
+router.get('/encuestas', isAdmin, encuestaController.getEncuestaResultados);
+router.put('/marcarRespondido/:id_encuesta', isAdmin, encuestaController.marcarComentarioRespondido);
 
 // Rutas para zonas
 /**
@@ -312,6 +323,8 @@ router.get('/preguntas/:id_pregunta', isAdmin, adminController.getPreguntaById);
  *           schema:
  *             type: object
  *             properties:
+ *               id_exposicion:
+ *                 type: integer
  *               texto_pregunta:
  *                 type: string
  *                 example: "¿Cuál es la capital de Francia?"

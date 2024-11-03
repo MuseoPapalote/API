@@ -1,4 +1,36 @@
 const adminModel = require('../models/adminModel');
+const userModel = require('../models/userModel');
+
+async function getAdminOverview(req,res){
+  try{
+    const overview = await adminModel.getAdminOverview();
+    res.json(overview);
+  }catch(error){
+    console.error('Error getting admin overview:', error);
+    res.status(500).json({ message: 'Error getting admin overview' });
+  }
+}
+
+async function getVisitStats(req,res){
+  try{
+    const stats = await adminModel.getVisitStats();
+    res.json(stats);
+  }catch(error){
+    console.error('Error getting visit stats:', error);
+    res.status(500).json({ message: 'Error getting visit stats' });
+  }
+}
+
+async function getUserEmails(req,res){
+  try{
+    const emails = await userModel.getUserEmails();
+    res.json(emails);
+  }catch(error){
+    console.error('Error getting user emails:', error);
+    res.status(500).json({ message: 'Error getting user emails' });
+  }
+}
+
 
 // Crear Zona
 async function createZona(req, res) {
@@ -76,9 +108,9 @@ async function deleteExposicion(req, res) {
 
 // Crear Pregunta
 async function createPregunta(req, res) {
-    const { texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta } = req.body;
+    const { id_exposicion,texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta } = req.body;
     try {
-        const nuevaPregunta = await adminModel.createPregunta(texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta);
+        const nuevaPregunta = await adminModel.createPregunta(id_exposicion,texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta);
         res.status(201).json({ message: 'Pregunta creada exitosamente', pregunta: nuevaPregunta });
     } catch (error) {
         console.error('Error al crear pregunta:', error);
@@ -268,6 +300,9 @@ async function getAllZonas(req, res) {
   }
 
 module.exports = {
+    getAdminOverview,
+    getVisitStats,
+    getUserEmails,
     createZona,
     editZona,
     deleteZona,
