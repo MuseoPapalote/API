@@ -44,11 +44,31 @@ async function getVisitStats(){
 // Zonas
 async function createZona(nombre_zona, descripcion) {
     try {
-        const query = 'INSERT INTO zona (nombre_zona, descripcion) VALUES ($1, $2) RETURNING *;';
-        const { rows } = await db.query(query, [nombre_zona, descripcion]);
+        const insertZonaQuery = 'INSERT INTO zona (nombre_zona, descripcion) VALUES ($1, $2) RETURNING id_zona;';
+        const { rows } = await db.query(insertZonaQuery, [nombre_zona, descripcion]);
+        const id_zona = rows[0].id_zona;
+
+        // Obtener todos los usuarios existentes
+        const usersQuery = 'SELECT id_usuario FROM usuario';
+        const { rows: users } = await db.query(usersQuery);
+
+        // Crear progreso para cada usuario en la nueva zona
+        const totalExposicionesQuery = 'SELECT COUNT(*) AS total FROM exposicion WHERE id_zona = $1;';
+        const { rows: exposiciones } = await db.query(totalExposicionesQuery, [id_zona]);
+        const totalExposiciones = parseInt(exposiciones[0].total, 10);
+
+        const insertProgressQuery = `
+            INSERT INTO progresozona (id_usuario, id_zona, exposiciones_visitadas, total_exposiciones, porcentaje_avance)
+            VALUES ($1, $2, 0, $3, 0.0);
+        `;
+
+        for (let user of users) {
+            await db.query(insertProgressQuery, [user.id_usuario, id_zona, totalExposiciones]);
+        }
+
         return rows[0];
     } catch (error) {
-        console.error('Error creating zona:', error);
+        console.error('Error al crear zona:', error);
         throw error;
     }
 }
