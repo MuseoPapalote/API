@@ -4,14 +4,102 @@ const adminController = require('../controllers/adminController');
 const encuestaController = require('../controllers/encuestaController');
 const { isAdmin } = require('../middlewares/isAdmin'); // Middleware de autenticación
 
-
 // Rutas para el panel de administrador
+
+/**
+ * @swagger
+ * /admin/overview:
+ *   get:
+ *     summary: Obtiene una vista general de estadísticas administrativas
+ *     tags:
+ *       - Administración
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Datos de vista general para administración
+ *       401:
+ *         description: No autorizado, el usuario no tiene acceso de administrador
+ */
 router.get('/overview', isAdmin, adminController.getAdminOverview);
+
+/**
+ * @swagger
+ * /admin/visitstats:
+ *   get:
+ *     summary: Obtiene estadísticas de visitas para zonas y exposiciones
+ *     tags:
+ *       - Administración
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Datos de estadísticas de visitas
+ *       401:
+ *         description: No autorizado, el usuario no tiene acceso de administrador
+ */
 router.get('/visitstats', isAdmin, adminController.getVisitStats);
+
+/**
+ * @swagger
+ * /admin/emails:
+ *   get:
+ *     summary: Obtiene una lista de correos electrónicos de todos los usuarios
+ *     tags:
+ *       - Administración
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de correos electrónicos de los usuarios
+ *       401:
+ *         description: No autorizado, el usuario no tiene acceso de administrador
+ */
 router.get('/emails', isAdmin, adminController.getUserEmails);
 
 // Rutas para encuestas de satisfacción
+
+/**
+ * @swagger
+ * /admin/encuestas:
+ *   get:
+ *     summary: Obtiene los resultados de las encuestas de satisfacción
+ *     tags:
+ *       - Administración
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Resultados de encuestas de satisfacción
+ *       401:
+ *         description: No autorizado, el usuario no tiene acceso de administrador
+ */
 router.get('/encuestas', isAdmin, encuestaController.getEncuestaResultados);
+
+/**
+ * @swagger
+ * /admin/marcarRespondido/{id_encuesta}:
+ *   put:
+ *     summary: Marca una encuesta como respondida por el administrador
+ *     tags:
+ *       - Administración
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id_encuesta
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la encuesta a marcar como respondida
+ *     responses:
+ *       200:
+ *         description: Encuesta marcada como respondida
+ *       401:
+ *         description: No autorizado, el usuario no tiene acceso de administrador
+ *       404:
+ *         description: Encuesta no encontrada
+ */
 router.put('/marcarRespondido/:id_encuesta', isAdmin, encuestaController.marcarComentarioRespondido);
 
 // Rutas para zonas
@@ -21,7 +109,7 @@ router.put('/marcarRespondido/:id_encuesta', isAdmin, encuestaController.marcarC
  *   get:
  *     summary: Obtiene todas las zonas
  *     tags:
- *       - Zonas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -36,7 +124,7 @@ router.get('/zonas', isAdmin, adminController.getAllZonas);
  *   get:
  *     summary: Obtiene una zona por su ID
  *     tags:
- *       - Zonas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -58,7 +146,7 @@ router.get('/zonas/:id_zona', isAdmin, adminController.getZonaById);
  *   post:
  *     summary: Crea una nueva zona
  *     tags:
- *       - Zonas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -86,7 +174,7 @@ router.post('/zonas', isAdmin, adminController.createZona);
  *   put:
  *     summary: Edita una zona existente
  *     tags:
- *       - Zonas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -121,7 +209,7 @@ router.put('/zonas/:id_zona', isAdmin, adminController.editZona);
  *   delete:
  *     summary: Elimina una zona por su ID
  *     tags:
- *       - Zonas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -144,7 +232,7 @@ router.delete('/zonas/:id_zona', isAdmin, adminController.deleteZona);
  *   get:
  *     summary: Obtiene todas las exposiciones
  *     tags:
- *       - Exposiciones
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -159,7 +247,7 @@ router.get('/exposiciones', isAdmin, adminController.getAllExposiciones);
  *   get:
  *     summary: Obtiene una exposición por su ID
  *     tags:
- *       - Exposiciones
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -181,7 +269,7 @@ router.get('/exposiciones/:id_exposicion', isAdmin, adminController.getExposicio
  *   post:
  *     summary: Crea una nueva exposición
  *     tags:
- *       - Exposiciones
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -215,7 +303,7 @@ router.post('/exposiciones', isAdmin, adminController.createExposicion);
  *   put:
  *     summary: Edita una exposición existente
  *     tags:
- *       - Exposiciones
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -253,7 +341,7 @@ router.put('/exposiciones/:id_exposicion', isAdmin, adminController.editExposici
  *   delete:
  *     summary: Elimina una exposición por su ID
  *     tags:
- *       - Exposiciones
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -276,7 +364,7 @@ router.delete('/exposiciones/:id_exposicion', isAdmin, adminController.deleteExp
  *   get:
  *     summary: Obtiene todas las preguntas
  *     tags:
- *       - Preguntas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     responses:
@@ -291,7 +379,7 @@ router.get('/preguntas', isAdmin, adminController.getAllPreguntas);
  *   get:
  *     summary: Obtiene una pregunta por su ID
  *     tags:
- *       - Preguntas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -313,7 +401,7 @@ router.get('/preguntas/:id_pregunta', isAdmin, adminController.getPreguntaById);
  *   post:
  *     summary: Crea una nueva pregunta
  *     tags:
- *       - Preguntas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -352,7 +440,7 @@ router.post('/preguntas', isAdmin, adminController.createPregunta);
  *   put:
  *     summary: Edita una pregunta existente
  *     tags:
- *       - Preguntas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -396,7 +484,7 @@ router.put('/preguntas/:id_pregunta', isAdmin, adminController.editPregunta);
  *   delete:
  *     summary: Elimina una pregunta por su ID
  *     tags:
- *       - Preguntas
+ *       - Administración
  *     security:
  *       - BearerAuth: []
  *     parameters:

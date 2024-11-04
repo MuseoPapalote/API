@@ -58,6 +58,47 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  */
 router.post('/', isAuthenticated, respuestaTriviaController.createRespuestaTrivia);
 
+/**
+ * @swagger
+ * /respuestaTrivia:
+ *   get:
+ *     summary: Obtener todas las respuestas de trivia de un usuario
+ *     description: Permite a un usuario autenticado ver todas sus respuestas a las preguntas de trivia.
+ *     tags:
+ *       - Trivia
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Respuestas de trivia obtenidas exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_respuesta:
+ *                     type: integer
+ *                     description: ID de la respuesta
+ *                   id_pregunta:
+ *                     type: integer
+ *                     description: ID de la pregunta respondida
+ *                   opcion_seleccionada:
+ *                     type: integer
+ *                     description: Opción seleccionada por el usuario
+ *                   es_correcta:
+ *                     type: boolean
+ *                     description: Indica si la respuesta fue correcta
+ *                   created_at:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Fecha y hora en que se respondió la pregunta
+ *       401:
+ *         description: No autorizado, el usuario no está autenticado
+ *       500:
+ *         description: Error interno del servidor
+ */
 router.get('/', isAuthenticated, respuestaTriviaController.getUserRespuestaTriviaAnswers);
 
 module.exports = router;
