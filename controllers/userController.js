@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 async function registerUser(req,res){
-    const {nombre, email, password} = req.body;
+    const {nombre, email, password, fecha_nacimiento} = req.body;
     try{
         const existeUsuario = await userModel.findUserByEmail(email);
         if(existeUsuario){
@@ -11,7 +11,7 @@ async function registerUser(req,res){
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await userModel.createUser({nombre, email, password: hashedPassword});
+        const newUser = await userModel.createUser({nombre, email, password: hashedPassword, fecha_nacimiento});
         await userModel.createProgressForuser(newUser.id_usuario);
         const token = jwt.sign({id_usuario: newUser.id_usuario}, process.env.JWT_SECRET, {expiresIn: '24h'});
         res.status(201).send({token});

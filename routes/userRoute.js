@@ -28,6 +28,9 @@ const { isAdmin } = require('../middlewares/isAdmin');
  *               password:
  *                 type: string
  *                 example: "password123"
+ *               fecha_nacimiento:
+ *                type: Date
+ *                example: "1990-01-01"
  *     responses:
  *       201:
  *         description: Usuario registrado exitosamente
