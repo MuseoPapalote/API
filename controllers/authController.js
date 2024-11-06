@@ -8,9 +8,10 @@ require('dotenv').config();
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:8080/auth/google/callback'
+    callbackURL: 'http://museoapi.org:8080/auth/google/callback'
     },
     async (accessToken, refreshToken, profile, done) =>{
+        console.log('Google profile:', profile);
         try {
             let user = await userModel.findUserByGoogleId(profile.id)
             if(!user){
@@ -36,10 +37,11 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: 'http://localhost:8080/auth/facebook/callback',
+    callbackURL: 'http://museoapi.org:8080/auth/facebook/callback',
     profileFields: ['id', 'displayName', 'email']
     },
     async(accessToken, refreshToken, profile, done) =>{
+        console.log(profile);
         try{
             let user = await userModel.findUserByFacebookId(profile.id);
             if(!user){
@@ -50,7 +52,7 @@ passport.use(new FacebookStrategy({
                 user = await userModel.createUserByFacebook({
                     nombre: profile.displayName,
                     email: profile.emails[0].value,
-                    facebook_id: profile.id
+                    facebook_id: profile.id,
                 });
             }
 
