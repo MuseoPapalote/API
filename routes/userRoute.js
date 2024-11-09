@@ -136,4 +136,8 @@ router.delete('/delete', isAuthenticated, userController.deleteUser);
  */
 router.post('/createAdmin', isAdmin, userController.createInitialAdmin);
 
+router.post('/token', userController.refreshAccessToken);
+
+router.post('/logout', userController.logout);
+
 module.exports = router;

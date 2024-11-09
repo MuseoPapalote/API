@@ -2,6 +2,14 @@ const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+function generateAccessToken(user){
+    return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.JWT_SECRET, {expiresIn: '1h'});
+}
+
+function generateRefreshToken(user){
+    return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '30d'});
+}
+
 async function registerUser(req,res){
     const {nombre, email, password, fecha_nacimiento} = req.body;
     try{
@@ -45,21 +53,17 @@ async function loginUser(req, res) {
     try {
         // Buscar al usuario por email
         const usuario = await userModel.findUserByEmail(email);
-        if (!usuario) {
-            return res.status(400).json({ message: 'Email no registrado.' });
+        if(!usuario || !(await bcrypt.compare(password, usuario.password))) {
+            return res.status(401).send('Correo o contraseña incorrectos');
         }
 
-        // Verificar la contraseña
-        const esPasswordValido = await bcrypt.compare(password, usuario.password);
-        if (!esPasswordValido) {
-            return res.status(400).json({ message: 'Contraseña incorrecta.' });
-        }
+        const accessToken = generateAccessToken(usuario);
+        const refreshToken = generateRefreshToken(usuario);
 
-        // Generar el token JWT
-        const token = jwt.sign({ id_usuario: usuario.id_usuario, rol:usuario.rol }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        await userModel.saveRefreshToken(usuario.id_usuario, refreshToken);
 
         // Respuesta exitosa con el token
-        res.status(200).json({ token });
+        res.status(200).json({ accessToken, refreshToken });
     } catch (error) {
         console.error('Error en el inicio de sesión del usuario:', error);
         res.status(500).send('Error en el servidor.');
@@ -78,4 +82,39 @@ async function deleteUser(req, res) {
     }
 }
 
-module.exports = { registerUser, loginUser, deleteUser, createInitialAdmin };
+async function refreshAccessToken(req,res){
+    const {refreshToken} = req.body;
+    if(!refreshToken){
+        return res.status(403).send('Token no proporcionado');
+    }
+
+    try{
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const storedRefreshToken = await userModel.getRefreshToken(decoded.id_usuario);
+
+        if(storedRefreshToken != refreshToken){
+            return res.status(403).json({message: 'Refresh token inválido'});
+        }
+
+        const newAccessToken = generateAccessToken(decoded);
+        res.status(200).json({accessToken: newAccessToken});
+
+    }catch(error){
+        console.error('Error al refrescar el token:', error);
+        res.status(500).send('Error al refrescar el token');
+    }
+}
+
+async function logoutUser(req,res){
+    const {refreshToken} = req.body;
+    try{
+        const decoded = jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET)
+        await userModel.invalidateRefreshToken(decoded.id_usuario);
+        res.status(200).json({message: 'Sesión cerrada correctamente'});
+    }catch(error){
+        console.error('Error al cerrar sesión:', error);
+        res.status(500).send({message:'Error al cerrar sesión'});
+    }
+}
+
+module.exports = { registerUser, loginUser, deleteUser, createInitialAdmin, refreshAccessToken, logoutUser };

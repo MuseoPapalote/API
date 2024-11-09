@@ -135,5 +135,35 @@ async function getUserEmails(){
     }
 }
 
+async function saveRefreshToken(userId, refreshToken){
+    try{
+        const query = 'UPDATE usuario SET refresh_token = $1 WHERE id_usuario = $2;';
+        await db.query(query, [refreshToken, userId]);
+    }catch(error){
+        console.error('Error al guardar el refresh token:', error);
+        throw error;
+    }
+}
 
-module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser, getUserEmails};
+async function getRefreshToken(userId){
+    try{
+        const query = 'SELECT refresh_token FROM usuario WHERE id_usuario = $1;';
+        const {rows} = await db.query(query, [userId]);
+        return rows[0]?.refresh_token || null;
+    }catch(error){
+        console.error('Error al obtener el refresh token:', error);
+        throw error;
+    }
+}
+
+async function invalidateRefreshToken(userId){
+    try{
+        const query = 'UPDATE usuario SET refresh_token = NULL WHERE id_usuario = $1;';
+        await db.query(query, [userId]);
+    }catch(error){
+        console.error('Error al invalidar el refresh token:', error);
+        throw error;
+    }
+}
+
+module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser, getUserEmails, saveRefreshToken, getRefreshToken, invalidateRefreshToken};
