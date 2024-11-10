@@ -62,17 +62,3 @@ passport.use(new FacebookStrategy({
         }
     }
 ));
-
-
-// passport.serializeUser((user, done) => {
-//     done(null, user.id_usuario);
-// })
-
-// passport.deserializeUser(async (id_usuario, done) => {
-//     try{
-//         const user = await userModel.findUserById(id_usuario);
-//         done(null, user);
-//     } catch(error){
-//         done(error);
-//     }
-// })

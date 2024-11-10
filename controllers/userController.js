@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 function generateAccessToken(user){
-    return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.JWT_SECRET, {expiresIn: '1h'});
+    return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.JWT_SECRET, {expiresIn: '15m'});
 }
 
 function generateRefreshToken(user){
@@ -21,8 +21,11 @@ async function registerUser(req,res){
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await userModel.createUser({nombre, email, password: hashedPassword, fecha_nacimiento});
         await userModel.createProgressForuser(newUser.id_usuario);
-        const token = jwt.sign({id_usuario: newUser.id_usuario}, process.env.JWT_SECRET, {expiresIn: '24h'});
-        res.status(201).send({token});
+
+        const accessToken = generateAccessToken(newUser);
+        const refreshToken = generateRefreshToken(newUser);
+
+        res.status(201).send({accessToken, refreshToken});
     } catch(error){
         console.error(error);
         res.status(500).send('Error al registrar usuario');

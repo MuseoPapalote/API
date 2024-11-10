@@ -138,6 +138,6 @@ router.post('/createAdmin', isAdmin, userController.createInitialAdmin);
 
 router.post('/token', userController.refreshAccessToken);
 
-router.post('/logout', userController.logout);
+router.post('/logout', userController.logoutUser);
 
 module.exports = router;
