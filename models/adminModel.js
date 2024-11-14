@@ -85,7 +85,20 @@ async function editZona(id_zona, nombre_zona, descripcion) {
 }
 
 async function deleteZona(id_zona) {
+    console.log(id_zona);
     try {
+        const exposiciones = 'SELECT id_exposicion FROM exposicion WHERE id_zona = $1;';
+        const { rows } = await db.query(exposiciones, [id_zona]);
+
+        for (let exposicion of rows) {
+            const visitaQuery = 'DELETE FROM visita WHERE id_exposicion = $1;';
+            await db.query(visitaQuery, [exposicion.id_exposicion]);
+            const preguntaQuery = 'DELETE FROM preguntatrivia WHERE id_exposicion = $1;';
+            await db.query(preguntaQuery, [exposicion.id_exposicion]);
+        }
+
+
+
         const exposicionQuery = 'DELETE FROM exposicion WHERE id_zona = $1;';
         await db.query(exposicionQuery, [id_zona]);
         const progresoQuery = 'DELETE FROM progresozona WHERE id_zona = $1;';
@@ -123,6 +136,14 @@ async function editExposicion(id_exposicion, nombre_exposicion, descripcion, cod
 
 async function deleteExposicion(id_exposicion) {
     try {
+        const preguntas = 'SELECT id_pregunta FROM preguntatrivia WHERE id_exposicion = $1;';
+        const { rows } = await db.query(preguntas, [id_exposicion]);
+
+        for (let pregunta of rows) {
+            const respuestas = 'DELETE FROM respuestatrivia WHERE id_pregunta = $1;';
+            await db.query(respuestas, [pregunta.id_pregunta]);
+        }
+
         const visitaQuery = 'DELETE FROM visita WHERE id_exposicion = $1;';
         await db.query(visitaQuery, [id_exposicion]);
         const query = 'DELETE FROM exposicion WHERE id_exposicion = $1;';
