@@ -98,11 +98,10 @@ async function deleteZona(id_zona) {
             for (let pregunta of rows) {
                 const respuestas = 'DELETE FROM respuestatrivia WHERE id_pregunta = $1;';
                 await db.query(respuestas, [pregunta.id_pregunta]);
+            }
             const preguntaQuery = 'DELETE FROM preguntatrivia WHERE id_exposicion = $1;';
             await db.query(preguntaQuery, [exposicion.id_exposicion]);
         }
-
-
 
         const exposicionQuery = 'DELETE FROM exposicion WHERE id_zona = $1;';
         await db.query(exposicionQuery, [id_zona]);
