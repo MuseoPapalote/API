@@ -11,7 +11,7 @@ function generateRefreshToken(user){
 }
 
 async function getUserInfo(req,res){
-    const {id_usuario} = req.user.id_usuario;
+    const id_usuario = req.user.id_usuario;
     try{
         const userInfo = await userModel.getUserInfo(id_usuario);
         res.status(200).json(userInfo);
