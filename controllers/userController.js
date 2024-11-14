@@ -10,6 +10,17 @@ function generateRefreshToken(user){
     return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '30d'});
 }
 
+async function getUserInfo(req,res){
+    const {id_usuario} = req.user.id_usuario;
+    try{
+        const userInfo = await userModel.getUserInfo(id_usuario);
+        res.status(200).json(userInfo);
+    }catch(error){
+        console.log('Error al obtener la información del usuario:', error);
+        res.status(500).send('Error al obtener la información del usuario');
+    }
+}
+
 async function registerUser(req,res){
     const {nombre, email, password, fecha_nacimiento} = req.body;
     try{
@@ -120,4 +131,4 @@ async function logoutUser(req,res){
     }
 }
 
-module.exports = { registerUser, loginUser, deleteUser, createInitialAdmin, refreshAccessToken, logoutUser };
+module.exports = { getUserInfo,registerUser, loginUser, deleteUser, createInitialAdmin, refreshAccessToken, logoutUser };

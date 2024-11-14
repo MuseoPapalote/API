@@ -1,5 +1,16 @@
 const {db} = require('../database/db');
 
+async function getUserInfo(userId){
+    try{
+        const query = 'SELECT nombre,email,fecha_nacimiento,rol FROM usuario WHERE id_usuario = $1';
+        const {rows} = await db.query(query, [userId]);
+        return rows[0];
+    } catch(error){
+        console.error('Error al obtener la informacion del usuario:', error);
+        throw error;
+    }
+}
+
 async function findUserByEmail(email){
     try{
         const query = 'SELECT * FROM usuario WHERE email = $1';
@@ -166,4 +177,4 @@ async function invalidateRefreshToken(userId){
     }
 }
 
-module.exports = {findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser, getUserEmails, saveRefreshToken, getRefreshToken, invalidateRefreshToken};
+module.exports = {getUserInfo,findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser, getUserEmails, saveRefreshToken, getRefreshToken, invalidateRefreshToken};

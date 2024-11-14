@@ -140,4 +140,6 @@ router.post('/token', userController.refreshAccessToken);
 
 router.post('/logout', userController.logoutUser);
 
+router.get('/profile', isAuthenticated, userController.getUserInfo);
+
 module.exports = router;
