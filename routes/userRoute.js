@@ -9,7 +9,7 @@ const { isAdmin } = require('../middlewares/isAdmin');
  * /usuarios/register:
  *   post:
  *     summary: Registra un nuevo usuario
- *     description: Permite registrar un usuario con nombre, email y contraseña
+ *     description: Permite registrar un usuario con nombre, email, contraseña y fecha de nacimiento.
  *     tags:
  *       - Usuarios
  *     requestBody:
@@ -29,15 +29,16 @@ const { isAdmin } = require('../middlewares/isAdmin');
  *                 type: string
  *                 example: "password123"
  *               fecha_nacimiento:
- *                type: Date
- *                example: "1990-01-01"
+ *                 type: string
+ *                 format: date
+ *                 example: "1990-01-01"
  *     responses:
  *       201:
- *         description: Usuario registrado exitosamente
+ *         description: Usuario registrado exitosamente con tokens generados.
  *       400:
- *         description: El correo ya está registrado
+ *         description: El correo ya está registrado.
  *       500:
- *         description: Error en el servidor
+ *         description: Error en el servidor.
  */
 router.post('/register', userController.registerUser);
 
@@ -46,7 +47,7 @@ router.post('/register', userController.registerUser);
  * /usuarios/login:
  *   post:
  *     summary: Inicia sesión en el sistema
- *     description: Permite a un usuario iniciar sesión con su email y contraseña
+ *     description: Permite a un usuario iniciar sesión con su email y contraseña. Genera tokens de acceso y refresco.
  *     tags:
  *       - Usuarios
  *     requestBody:
@@ -64,19 +65,11 @@ router.post('/register', userController.registerUser);
  *                 example: "password123"
  *     responses:
  *       200:
- *         description: Inicio de sesión exitoso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   example: "jwt_token_example"
- *       400:
- *         description: Email o contraseña incorrectos
+ *         description: Inicio de sesión exitoso con tokens de acceso y refresco.
+ *       401:
+ *         description: Correo o contraseña incorrectos.
  *       500:
- *         description: Error en el servidor
+ *         description: Error en el servidor.
  */
 router.post('/login', userController.loginUser);
 
@@ -85,18 +78,18 @@ router.post('/login', userController.loginUser);
  * /usuarios/delete:
  *   delete:
  *     summary: Elimina un usuario
- *     description: Elimina la cuenta del usuario autenticado
+ *     description: Elimina la cuenta del usuario autenticado.
  *     tags:
  *       - Usuarios
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Usuario eliminado correctamente
+ *         description: Usuario eliminado correctamente.
  *       401:
- *         description: No autorizado (token no válido o faltante)
+ *         description: No autorizado (token no válido o faltante).
  *       500:
- *         description: Error en el servidor
+ *         description: Error en el servidor.
  */
 router.delete('/delete', isAuthenticated, userController.deleteUser);
 
@@ -105,7 +98,7 @@ router.delete('/delete', isAuthenticated, userController.deleteUser);
  * /usuarios/createAdmin:
  *   post:
  *     summary: Crea un usuario administrador
- *     description: Permite a un administrador crear un nuevo usuario con privilegios de administrador
+ *     description: Permite a un administrador crear un nuevo usuario con privilegios de administrador.
  *     tags:
  *       - Usuarios
  *     security:
@@ -126,20 +119,89 @@ router.delete('/delete', isAuthenticated, userController.deleteUser);
  *               password:
  *                 type: string
  *                 example: "adminpassword123"
+ *               rol:
+ *                 type: string
+ *                 example: "admin"
  *     responses:
  *       201:
- *         description: Usuario administrador creado exitosamente
+ *         description: Usuario administrador creado exitosamente.
  *       403:
- *         description: No autorizado, solo los administradores pueden acceder a este endpoint
+ *         description: No autorizado, solo los administradores pueden acceder a este endpoint.
  *       500:
- *         description: Error en el servidor
+ *         description: Error en el servidor.
  */
 router.post('/createAdmin', isAdmin, userController.createInitialAdmin);
 
+/**
+ * @swagger
+ * /usuarios/token:
+ *   post:
+ *     summary: Genera un nuevo token de acceso
+ *     description: Genera un nuevo token de acceso usando un token de refresco.
+ *     tags:
+ *       - Usuarios
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: "refresh_token_example"
+ *     responses:
+ *       200:
+ *         description: Nuevo token de acceso generado.
+ *       403:
+ *         description: Token de refresco inválido o no proporcionado.
+ *       500:
+ *         description: Error en el servidor.
+ */
 router.post('/token', userController.refreshAccessToken);
 
+/**
+ * @swagger
+ * /usuarios/logout:
+ *   post:
+ *     summary: Cierra sesión del usuario
+ *     description: Invalida el token de refresco y cierra sesión del usuario.
+ *     tags:
+ *       - Usuarios
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: "refresh_token_example"
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada correctamente.
+ *       500:
+ *         description: Error al cerrar sesión.
+ */
 router.post('/logout', userController.logoutUser);
 
+/**
+ * @swagger
+ * /usuarios/profile:
+ *   get:
+ *     summary: Obtiene la información del perfil del usuario autenticado
+ *     description: Obtiene detalles de perfil para el usuario autenticado.
+ *     tags:
+ *       - Usuarios
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Información del perfil obtenida exitosamente.
+ *       500:
+ *         description: Error al obtener la información del perfil.
+ */
 router.get('/profile', isAuthenticated, userController.getUserInfo);
 
 module.exports = router;
