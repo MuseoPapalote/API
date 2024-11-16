@@ -204,4 +204,35 @@ router.post('/logout', userController.logoutUser);
  */
 router.get('/profile', isAuthenticated, userController.getUserInfo);
 
+/**
+ * @swagger
+ * /usuarios:
+ *   put:
+ *     summary: Actualiza el email y la contraseña del usuario autenticado
+ *     description: Permite a un usuario actualizar su email y contraseña.
+ *     tags:
+ *       - Usuarios
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "nuevo.correo@example.com"
+ *               password:
+ *                 type: string
+ *                 example: "nuevaPassword123"
+ *     responses:
+ *       200:
+ *         description: Datos actualizados correctamente.
+ *       500:
+ *         description: Error en el servidor al actualizar los datos del usuario.
+ */
+router.put('/',isAuthenticated,userController.updateUserEmailAndPassword);
+
 module.exports = router;

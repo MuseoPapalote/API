@@ -96,6 +96,21 @@ async function deleteUser(req, res) {
     }
 }
 
+async function updateUserEmailAndPassword(req,res){
+    try{
+        const {id_usuario} = req.user;
+        const {email,password} = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        await userModel.updateUserEmailAndPassword(id_usuario,email,hashedPassword);
+
+        res.status(200).json({ message: 'Datos actualizados correctamente'});
+    }catch(error){
+        console.error(error);
+        res.status(500).send('Error al actualizar datos del usuario')
+    }
+}
+
 async function refreshAccessToken(req,res){
     const {refreshToken} = req.body;
     if(!refreshToken){
@@ -131,4 +146,4 @@ async function logoutUser(req,res){
     }
 }
 
-module.exports = { getUserInfo,registerUser, loginUser, deleteUser, createInitialAdmin, refreshAccessToken, logoutUser };
+module.exports = { getUserInfo,registerUser, loginUser, deleteUser, createInitialAdmin, refreshAccessToken, logoutUser, updateUserEmailAndPassword };

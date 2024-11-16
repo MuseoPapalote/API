@@ -136,6 +136,17 @@ async function findUserById(id){
     }
 }
 
+async function updateUserEmailAndPassword(userId,email,password){
+    try{
+        const query = 'UPDATE usuario SET email = $1, password = $2 WHERE id_usuario =$3 RETURNING *'
+        const {rows} = await db.query(query,[email,password,userId]);
+        return rows[0];
+    }catch(error){
+        console.error("Error al intentar actualizar correo y/o contraseña");
+        throw error;
+    }
+}
+
 async function getUserEmails(){
     try{
         const query = 'SELECT email FROM usuario WHERE rol = $1';
@@ -178,4 +189,4 @@ async function invalidateRefreshToken(userId){
     }
 }
 
-module.exports = {getUserInfo,findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser, getUserEmails, saveRefreshToken, getRefreshToken, invalidateRefreshToken};
+module.exports = {getUserInfo,updateUserEmailAndPassword,findUserByEmail, createUser, createProgressForuser, findUserByGoogleId, createUserByGoogle, findUserById, findUserByFacebookId, createUserByFacebook, deleteUser, createAdminUser, getUserEmails, saveRefreshToken, getRefreshToken, invalidateRefreshToken};
