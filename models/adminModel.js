@@ -6,7 +6,8 @@ async function getAdminOverview(){
         const query = `
         SELECT
             (SELECT COUNT(*) FROM zona) AS total_zonas,
-            (SELECT COUNT(*) FROM exposicion) AS total_exposiciones;
+            (SELECT COUNT(*) FROM exposicion) AS total_exposiciones,
+            (SELECT COUNT(*) FROM preguntaTrivia) AS total_preguntas;
     `;
         const { rows } = await db.query(query);
         return rows;
