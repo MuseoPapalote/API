@@ -19,6 +19,7 @@ const progressZoneRoutes = require('./routes/progressZoneRoute');
 const visitRoutes = require('./routes/visitRoute');
 const encuestaRoutes = require('./routes/encuestaRoute');
 const respuestaTriviaRoutes = require('./routes/respuestaTriviaRoute');
+const preguntaTriviaRoutes = require('./routes/preguntaTriviaRoute');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -40,6 +41,7 @@ app.use('/progressZone', progressZoneRoutes);
 app.use('/visit', visitRoutes);
 app.use('/encuesta', encuestaRoutes);
 app.use('/respuestaTrivia', respuestaTriviaRoutes);
+app.use('/preguntaTrivia', preguntaTriviaRoutes);
 
 app.get('/dashboard',(req,res) => {
     if(req.isAuthenticated()){

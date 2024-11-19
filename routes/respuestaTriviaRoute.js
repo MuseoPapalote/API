@@ -10,7 +10,7 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  *     summary: Enviar respuesta de trivia
  *     description: Permite a un usuario autenticado enviar una respuesta a una pregunta de trivia.
  *     tags:
- *       - Trivia
+ *       - Respuesta Trivia
  *     security:
  *       - BearerAuth: []
  *     requestBody:
@@ -65,7 +65,7 @@ router.post('/', isAuthenticated, respuestaTriviaController.createRespuestaTrivi
  *     summary: Obtener todas las respuestas de trivia de un usuario
  *     description: Permite a un usuario autenticado ver todas sus respuestas a las preguntas de trivia.
  *     tags:
- *       - Trivia
+ *       - Respuesta Trivia
  *     security:
  *       - BearerAuth: []
  *     responses:
