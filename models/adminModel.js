@@ -162,6 +162,9 @@ async function deleteExposicion(id_exposicion) {
 // Preguntas
 async function createPregunta(id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) {
     try {
+        const queryExpositionId = 'SELECT id_exposicion FROM exposicion WHERE nombre_exposicion = $1;';
+        const { rows: expositionId } = await db.query(queryExpositionId, [id_exposicion]);
+        id_exposicion = expositionId[0].id_exposicion;
         const query = 'INSERT INTO preguntatrivia (id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;';
         const { rows } = await db.query(query, [id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta]);
         return rows[0];
@@ -173,6 +176,9 @@ async function createPregunta(id_exposicion,texto_pregunta, opcion_1, opcion_2, 
 
 async function editPregunta(id_pregunta, texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) {
     try {
+        const queryExpositionId = 'SELECT id_exposicione FROM exposicion WHERE nombre_exposicion = $1;'
+        const {rows:expositionId} = await db.query(queryExpositionId,[expositionId]);
+        id_exposicion = expositionId[0].id_exposicion;
         const query = 'UPDATE preguntatrivia SET texto_pregunta = $1, opcion_1 = $2, opcion_2 = $3, opcion_3 = $4, respuesta_correcta = $5 WHERE id_pregunta = $6 RETURNING *;';
         const { rows } = await db.query(query, [texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta, id_pregunta]);
         return rows[0];
