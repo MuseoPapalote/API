@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 function generateAccessToken(user){
-    return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.JWT_SECRET, {expiresIn: '15m'});
+    return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.JWT_SECRET, {expiresIn: '2h'});
 }
 
 function generateRefreshToken(user){
