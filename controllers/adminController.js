@@ -108,9 +108,9 @@ async function deleteExposicion(req, res) {
 
 // Crear Pregunta
 async function createPregunta(req, res) {
-    const { id_exposicion,texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta } = req.body;
+    const { nombre_exposicion,texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta,id_zona } = req.body;
     try {
-        const nuevaPregunta = await adminModel.createPregunta(id_exposicion,texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta);
+        const nuevaPregunta = await adminModel.createPregunta(nombre_exposicion,texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta,id_zona);
         res.status(201).json({ message: 'Pregunta creada exitosamente', pregunta: nuevaPregunta });
     } catch (error) {
         console.error('Error al crear pregunta:', error);
@@ -121,9 +121,9 @@ async function createPregunta(req, res) {
 // Editar Pregunta
 async function editPregunta(req, res) {
     const { id_pregunta } = req.params;
-    const { texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta } = req.body;
+    const { texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta,id_zona } = req.body;
     try {
-        const preguntaEditada = await adminModel.editPregunta(id_pregunta, texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta);
+        const preguntaEditada = await adminModel.editPregunta(id_pregunta, texto_pregunta, opcion_1,opcion_2,opcion_3,respuesta_correcta,id_zona);
         res.status(200).json({ message: 'Pregunta editada exitosamente', pregunta: preguntaEditada });
     } catch (error) {
         console.error('Error al editar pregunta:', error);

@@ -4,7 +4,6 @@ async function getUserInfo(userId){
     try{
         const query = 'SELECT nombre,email,fecha_nacimiento FROM usuario WHERE id_usuario = $1';
         const {rows} = await db.query(query, [userId]);
-        console.log({rows});
         return rows[0];
     } catch(error){
         console.error('Error al obtener la informacion del usuario:', error);

@@ -86,7 +86,6 @@ async function editZona(id_zona, nombre_zona, descripcion) {
 }
 
 async function deleteZona(id_zona) {
-    console.log(id_zona);
     try {
         const exposiciones = 'SELECT id_exposicion FROM exposicion WHERE id_zona = $1;';
         const { rows } = await db.query(exposiciones, [id_zona]);
@@ -160,13 +159,13 @@ async function deleteExposicion(id_exposicion) {
 }
 
 // Preguntas
-async function createPregunta(id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) {
+async function createPregunta(nombre_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta,id_zona) {
     try {
         const queryExpositionId = 'SELECT id_exposicion FROM exposicion WHERE nombre_exposicion = $1;';
-        const { rows: expositionId } = await db.query(queryExpositionId, [id_exposicion]);
-        id_exposicion = expositionId[0].id_exposicion;
-        const query = 'INSERT INTO preguntatrivia (id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;';
-        const { rows } = await db.query(query, [id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta]);
+        const {rows:id_exposicion} = await db.query(queryExpositionId, [nombre_exposicion]);
+        idExposicion = id_exposicion[0].id_exposicion;
+        const query = 'INSERT INTO preguntatrivia (id_exposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta,id_zona) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;';
+        const { rows } = await db.query(query, [idExposicion,texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta,id_zona]);
         return rows[0];
     } catch (error) {
         console.error('Error creating pregunta:', error);
@@ -174,10 +173,10 @@ async function createPregunta(id_exposicion,texto_pregunta, opcion_1, opcion_2, 
     }
 }
 
-async function editPregunta(id_pregunta, texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta) {
+async function editPregunta(id_pregunta, texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta,id_zona,nombre_exposicion) {
     try {
         const queryExpositionId = 'SELECT id_exposicione FROM exposicion WHERE nombre_exposicion = $1;'
-        const {rows:expositionId} = await db.query(queryExpositionId,[expositionId]);
+        const {rows:id_exposicion} = await db.query(queryExpositionId,[nombre_exposicion]);
         id_exposicion = expositionId[0].id_exposicion;
         const query = 'UPDATE preguntatrivia SET texto_pregunta = $1, opcion_1 = $2, opcion_2 = $3, opcion_3 = $4, respuesta_correcta = $5 WHERE id_pregunta = $6 RETURNING *;';
         const { rows } = await db.query(query, [texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta, id_pregunta]);
