@@ -175,11 +175,11 @@ async function createPregunta(nombre_exposicion,texto_pregunta, opcion_1, opcion
 
 async function editPregunta(id_pregunta, texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta,id_zona,nombre_exposicion) {
     try {
-        const queryExpositionId = 'SELECT id_exposicione FROM exposicion WHERE nombre_exposicion = $1;'
+        const queryExpositionId = 'SELECT id_exposicion FROM exposicion WHERE nombre_exposicion = $1;'
         const {rows:id_exposicion} = await db.query(queryExpositionId,[nombre_exposicion]);
-        id_exposicion = expositionId[0].id_exposicion;
-        const query = 'UPDATE preguntatrivia SET texto_pregunta = $1, opcion_1 = $2, opcion_2 = $3, opcion_3 = $4, respuesta_correcta = $5 WHERE id_pregunta = $6 RETURNING *;';
-        const { rows } = await db.query(query, [texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta, id_pregunta]);
+        idExposicion = expositionId[0].id_exposicion;
+        const query = 'UPDATE preguntatrivia SET texto_pregunta = $1, opcion_1 = $2, opcion_2 = $3, opcion_3 = $4, respuesta_correcta = $5, id_zona = $6, id_exposicion =$7 WHERE id_pregunta = $8 RETURNING *;';
+        const { rows } = await db.query(query, [texto_pregunta, opcion_1, opcion_2, opcion_3, respuesta_correcta,id_zona,idExposicion, id_pregunta]);
         return rows[0];
     } catch (error) {
         console.error('Error editing pregunta:', error);
