@@ -1,4 +1,5 @@
 const {db} = require('../database/db');
+const { get } = require('../routes/visitRoute');
 
 async function registerVisit({id_usuario, id_exposicion}){
     try{
@@ -22,4 +23,17 @@ async function findExposicionByQr(codigo_qr){
     }
 }
 
-module.exports = {registerVisit,findExposicionByQr}
+async function getVisits(id_usuario){
+    try{
+        const query = 'SELECT DISTINCT ON (id_exposicion) * FROM visita WHERE id_usuario = $1 ORDER BY id_exposicion, fecha_hora_visita DESC;';
+        const {rows} = await db.query(query, [id_usuario]);
+
+        const uniqueVisitsCount = rows.length;
+        return {total: uniqueVisitsCount, visits: rows};
+    }catch(error){
+        console.error('Error al buscar visitas:', error);
+        throw error;
+    }
+}
+
+module.exports = {registerVisit,findExposicionByQr, getVisits}

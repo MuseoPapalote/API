@@ -1,6 +1,4 @@
 const visitModel = require('../models/visitModel');
-const expositionModel = require('../models/expositionModel');
-const progressZoneModel = require('../models/progressZoneModel');
 
 async function registerVisit(req, res){
     const id_usuario = req.user.id_usuario;
@@ -21,4 +19,15 @@ async function registerVisit(req, res){
     }
 }
 
-module.exports = {registerVisit}
+async function getVisits(req,res){
+    try{
+        const id_usuario = req.user.id_usuario;
+        const visits = await visitModel.getVisits(id_usuario);
+        res.send(visits);
+    }catch(error){
+        console.error(error);
+        res.status(500).send('Error al buscar visitas');
+    }
+}
+
+module.exports = {registerVisit, getVisits};

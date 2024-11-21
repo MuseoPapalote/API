@@ -52,4 +52,52 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  */
 router.post('/register', isAuthenticated, visitController.registerVisit);
 
+/**
+ * @swagger
+ * /visit:
+ *   get:
+ *     summary: Obtiene todas las visitas de un usuario autenticado
+ *     description: Retorna una lista de todas las visitas realizadas por el usuario autenticado a exposiciones.
+ *     tags:
+ *       - Visitas
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de visitas del usuario autenticado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_visita:
+ *                     type: integer
+ *                     description: ID de la visita
+ *                     example: 1
+ *                   id_usuario:
+ *                     type: integer
+ *                     description: ID del usuario que realizó la visita
+ *                     example: 123
+ *                   id_exposicion:
+ *                     type: integer
+ *                     description: ID de la exposición visitada
+ *                     example: 456
+ *                   nombre_exposicion:
+ *                     type: string
+ *                     description: Nombre de la exposición visitada
+ *                     example: "Arte Egipcio"
+ *                   fecha_visita:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Fecha y hora de la visita
+ *                     example: "2024-11-09T10:15:30Z"
+ *       401:
+ *         description: No autorizado. El usuario no está autenticado.
+ *       500:
+ *         description: Error al buscar visitas.
+ */
+router.get('/', isAuthenticated, visitController.getVisits);
+
 module.exports = router;
