@@ -71,7 +71,7 @@ async function loginOrRegisterWithGoogle(req,res){
     try{
         const ticket = await client.verifyIdToken({
             idToken: idToken,
-            audience: process.env.GOOGLE_CLIENT_ID
+            audience: process.env.GOOGLE_CLIENT_ID_MOBILE
         });
 
         const payload = ticket.getPayload();
