@@ -1,5 +1,6 @@
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const {OAuth2Client} = require('google-auth-library');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const userModel = require('../models/userModel');
@@ -62,3 +63,42 @@ passport.use(new FacebookStrategy({
         }
     }
 ));
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+async function loginOrRegisterWithGoogle(req,res){
+    const {idToken} = req.body;
+
+    try{
+        const ticket = await client.verifyIdToken({
+            idToken: idToken,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+        const googleId = payload['sub'];
+        const email = payload['email'];
+        const nombre = payload['name'];
+
+        let user = await userModel.findUserByGoogleId(googleId);
+        if(!user){
+            const existeUsuario = await userModel.findUserByEmail(email);
+            if(existeUsuario){
+                return res.status(400).json({message: 'El correo ya está registrado'});
+            }
+            user = await userModel.createUserByGoogle({
+                nombre: nombre,
+                email: email,
+                google_id: googleId
+            });
+        }
+
+        const token = jwt.sign({id_usuario: user.id_usuario}, process.env.JWT_SECRET, {expiresIn: '2h'});
+
+        return res.status(200).json({user, token});
+    }catch(error){
+        console.log('Error al verificar el token de Google:', error);
+        return res.status(500).json({message: 'Error al verificar el token de Google'});
+    }
+}
+
+module.exports = {loginOrRegisterWithGoogle};

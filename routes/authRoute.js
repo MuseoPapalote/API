@@ -116,4 +116,52 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
+/**
+ * @swagger
+ * /auth/google/mobile:
+ *   post:
+ *     summary: Login/Register con Google desde la app móvil
+ *     description: Verifica el ID Token enviado desde la app móvil, registra un nuevo usuario si no existe o inicia sesión si ya está registrado.
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: ID Token proporcionado por Google Sign-In
+ *     responses:
+ *       200:
+ *         description: Login o registro exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de éxito
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                 token:
+ *                   type: string
+ *       400:
+ *         description: Error en la solicitud (e.g., el correo ya está registrado)
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.post('/google/mobile', authController.loginOrRegisterWithGoogle);
+
+
 module.exports = router;
