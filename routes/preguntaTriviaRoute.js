@@ -52,4 +52,6 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  */
 router.get('/', isAuthenticated, preguntaTriviaController.getRandomTrivia);
 
+router.post('/',isAuthenticated, preguntaTriviaController.getTriviaFromZona);
+
 module.exports = router;
