@@ -7,7 +7,7 @@ async function createRespuestaTrivia(id_pregunta, id_usuario, opcion_seleccionad
         const respuestaCorrecta = resultCorrecta.rows[0].respuesta_correcta;
 
         const esCorrecta = respuestaCorrecta === opcion_seleccionada;
-        const query = 'INSERT INTO respuestatrivia (id_usuario, id_pregunta, opcion_seleccionada, es_correcta) VALUES ($1, $2, $3, $4) RETURNING *;';
+        const query = 'INSERT INTO respuestatrivia (id_usuario, id_pregunta, opcion_seleccionada, es_correcta) VALUES ($1, $2, $3, $4) RETURNING id_usuario, id_pregunta, opcion_seleccionada, es_correcta;';
         const {rows} = await db.query(query, [id_usuario, id_pregunta, opcion_seleccionada, esCorrecta]);
         return rows[0];
     }catch(error){
