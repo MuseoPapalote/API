@@ -36,9 +36,6 @@ const { isAuthenticated } = require('../middlewares/isAuthenticated');
  *             schema:
  *               type: object
  *               properties:
- *                 id_respuesta:
- *                   type: integer
- *                   description: ID de la respuesta registrada
  *                 id_usuario:
  *                   type: integer
  *                   description: ID del usuario que envió la respuesta
