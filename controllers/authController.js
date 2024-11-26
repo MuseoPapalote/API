@@ -66,7 +66,7 @@ passport.use(new FacebookStrategy({
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 async function loginOrRegisterWithGoogle(req,res){
-    const idToken = req.body;
+    const idToken = req.body.idToken;
 
     try{
         const ticket = await client.verifyIdToken({
