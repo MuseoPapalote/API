@@ -63,8 +63,16 @@ passport.use(new FacebookStrategy({
                 });
             }
 
-            const token = jwt.sign({id_usuario: user.id_usuario}, process.env.JWT_SECRET, {expiresIn: '24h'});
-            return done(null, {user, token});
+            
+            const accessToken = generateAccessToken(user);
+
+            const refreshToken = generateRefreshToken(user);
+
+            await userModel.saveRefreshToken(user.id_usuario, refreshToken);
+
+            const deepLink = 'yourapp://auth/facebook/callback?accessToken=${accessToken}&refreshToken=${refreshToken}';
+
+            return done(null, {accessToken, refreshToken, deepLink});
         } catch(error){
             console.log('Error durante la autenticación con Facebook:', error);
             return done(error);

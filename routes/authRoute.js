@@ -93,9 +93,8 @@ router.get('/facebook',
 router.get('/facebook/callback',
     passport.authenticate('facebook', {failureRedirect: '/', session: false}),
     (req, res) => {
-        const {user, token} = req.user;
-        res.json({user, token});
-        res.redirect('/dashboard');
+        const {accessToken, refreshToken, deepLink} = req.user;
+        res.redirect(deepLink);
     }
 );
 
