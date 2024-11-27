@@ -10,6 +10,37 @@ function generateRefreshToken(user){
     return jwt.sign({id_usuario: user.id_usuario, rol: user.rol}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '30d'});
 }
 
+async function verifyRefreshToken(req, res) {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(403).json({ message: 'Refresh token no proporcionado' });
+    }
+
+    try {
+        // Decodifica el token para obtener el ID del usuario
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        // Obtén el token almacenado en la base de datos para este usuario
+        const storedRefreshToken = await userModel.getRefreshToken(decoded.id_usuario);
+
+        // Compara el token recibido con el almacenado
+        if (storedRefreshToken !== refreshToken) {
+            return res.status(403).json({ message: 'Refresh token inválido' });
+        }
+
+        // Genera un nuevo token de acceso si el refreshToken es válido
+        const accesstoken = generateAccessToken(decoded);
+
+        // Devuelve un estado exitoso con el nuevo token de acceso
+        res.status(200).json(accessToken);
+    } catch (error) {
+        console.error('Error al verificar el refresh token:', error);
+        return res.status(403).json({ message: 'Token no válido o expirado' });
+    }
+}
+
+
 async function getUserInfo(req,res){
     const id_usuario = req.user.id_usuario;
     try{
@@ -148,4 +179,4 @@ async function logoutUser(req,res){
     }
 }
 
-module.exports = { getUserInfo,registerUser, loginUser, deleteUser, createInitialAdmin, refreshAccessToken, logoutUser, updateUserEmailAndPassword };
+module.exports = { getUserInfo,registerUser, loginUser, deleteUser, createInitialAdmin, refreshAccessToken, logoutUser, updateUserEmailAndPassword, verifyRefreshToken };

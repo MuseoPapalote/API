@@ -270,4 +270,34 @@ router.get('/profile', isAuthenticated, userController.getUserInfo);
  */
 router.put('/',isAuthenticated,userController.updateUserEmailAndPassword);
 
+
+/**
+ * @swagger
+ * /usuarios/verifyRefreshToken:
+ *   post:
+ *     summary: Verifica si el refreshToken es válido
+ *     description: Comprueba si el refreshToken proporcionado coincide con el almacenado en la base de datos y genera un nuevo accessToken si es válido.
+ *     tags:
+ *       - Usuarios
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: El refreshToken del usuario
+ *                 example: "refresh_token_example"
+ *     responses:
+ *       200:
+ *         description: Refresh token válido, se genera un nuevo accessToken.
+ *       403:
+ *         description: Refresh token inválido o no proporcionado.
+ *       500:
+ *         description: Error al procesar la solicitud.
+ */
+router.post('/verifyRefreshToken', userController.verifyRefreshToken);
+
 module.exports = router;
