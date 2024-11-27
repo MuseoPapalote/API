@@ -29,11 +29,8 @@ async function verifyRefreshToken(req, res) {
             return res.status(403).json({ message: 'Refresh token inválido' });
         }
 
-        // Genera un nuevo token de acceso si el refreshToken es válido
-        const accesstoken = generateAccessToken(decoded);
-
         // Devuelve un estado exitoso con el nuevo token de acceso
-        res.status(200).json(accessToken);
+        res.status(200).json(true);
     } catch (error) {
         console.error('Error al verificar el refresh token:', error);
         return res.status(403).json({ message: 'Token no válido o expirado' });
