@@ -36,6 +36,8 @@ async function registerUser(req,res){
         const accessToken = generateAccessToken(newUser);
         const refreshToken = generateRefreshToken(newUser);
 
+        await userModel.saveRefreshToken(newUser.id_usuario, refreshToken);
+
         res.status(201).send({accessToken, refreshToken});
     } catch(error){
         console.error(error);
