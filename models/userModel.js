@@ -2,9 +2,13 @@ const {db} = require('../database/db');
 
 async function getUserInfo(userId){
     try{
+        const visitasQuery = 'SELECT e.nombre_exposicion, v.fecha_hora_visita FROM visita v JOIN exposicion e ON v.id_exposicion = e.id_exposicion WHERE v.id_usuario = $1 ORDER BY v.fecha_hora_visita DESC;';
+        const {rows: visitas} = await db.query(visitasQuery, [userId]);
+
+
         const query = 'SELECT nombre,email,fecha_nacimiento FROM usuario WHERE id_usuario = $1';
         const {rows} = await db.query(query, [userId]);
-        return rows[0];
+        return {...rows[0], visitas};
     } catch(error){
         console.error('Error al obtener la informacion del usuario:', error);
         throw error;

@@ -191,7 +191,7 @@ router.post('/logout', userController.logoutUser);
  * /usuarios/profile:
  *   get:
  *     summary: Obtiene la información del perfil del usuario autenticado
- *     description: Obtiene detalles de perfil para el usuario autenticado.
+ *     description: Obtiene detalles del perfil del usuario autenticado, incluyendo nombre, email, fecha de nacimiento y visitas realizadas.
  *     tags:
  *       - Usuarios
  *     security:
@@ -199,6 +199,41 @@ router.post('/logout', userController.logoutUser);
  *     responses:
  *       200:
  *         description: Información del perfil obtenida exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 nombre:
+ *                   type: string
+ *                   description: Nombre del usuario.
+ *                   example: "César"
+ *                 email:
+ *                   type: string
+ *                   description: Correo electrónico del usuario.
+ *                   example: "example@gmail.com"
+ *                 fecha_nacimiento:
+ *                   type: string
+ *                   format: date
+ *                   description: Fecha de nacimiento del usuario (puede ser null).
+ *                   example: null
+ *                 visitas:
+ *                   type: array
+ *                   description: Lista de exposiciones que el usuario ha visitado.
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       nombre_exposicion:
+ *                         type: string
+ *                         description: Nombre de la exposición visitada.
+ *                         example: "Mosaicos Griegos"
+ *                       fecha_hora_visita:
+ *                         type: string
+ *                         format: date-time
+ *                         description: Fecha y hora de la visita a la exposición.
+ *                         example: "2024-10-30T01:39:43.913Z"
+ *       401:
+ *         description: No autorizado, el usuario no está autenticado.
  *       500:
  *         description: Error al obtener la información del perfil.
  */
